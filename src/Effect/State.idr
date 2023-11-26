@@ -1,37 +1,45 @@
 module Effect.State
 
 import Effects
+import Data.List.Elem
 
-%access public export
-
+public export
 data State : Effect where
   Get :      sig State a  a
   Put : b -> sig State () a b
 
 -- using (m : Type -> Type)
+public export
 implementation Handler State m where
      handle st Get     k = k st st
      handle st (Put n) k = k () n
 
+public export
 STATE : Type -> EFFECT
 STATE t = MkEff t State
 
-get : Eff x [STATE x]
-get = call $ Get
+public export
+get : {x : _} -> Eff x [STATE x]
+get = call Get {prf=Here}
 
-put : x -> Eff () [STATE x]
-put val = call $ Put val
+public export
+put : {x : _} -> x -> Eff () [STATE x]
+put val = call (Put val) {prf=Here}
 
-putM : y -> Eff () [STATE x] [STATE y]
-putM val = call $ Put val
+public export
+putM : {x, y : _} -> y -> Eff () [STATE x] [STATE y]
+putM val = call (Put val) {prf=Here}
 
-update : (x -> x) -> Eff () [STATE x]
+public export
+update : {x : _} -> (x -> x) -> Eff () [STATE x]
 update f = put (f !get)
 
-updateM : (x -> y) -> Eff () [STATE x] [STATE y]
+public export
+updateM : {x, y : _} -> (x -> y) -> Eff () [STATE x] [STATE y]
 updateM f = putM (f !get)
 
-locally : x -> (Eff t [STATE x]) -> Eff t [STATE y]
+public export
+locally : {x, y : _} -> x -> (Eff t [STATE x]) -> Eff t [STATE y]
 locally newst prog = do st <- get
                         putM newst
                         val <- prog
