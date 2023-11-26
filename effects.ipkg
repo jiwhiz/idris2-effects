@@ -1,0 +1,8 @@
+package effects
+
+authors    = "Yuan Ji"
+version    = 0.0.1
+
+sourcedir = "src"
+depends   = base    >= 0.6.0
+modules   = Effects
