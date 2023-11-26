@@ -270,9 +270,13 @@ namespace DepEff
 
 
 export
-(>>=)   : EffM m a xs xs' ->
-          ((val : a) -> EffM m b (xs' val) xs'') -> EffM m b xs xs''
+(>>=) : EffM m a xs xs' ->
+        ((val : a) -> EffM m b (xs' val) xs'') -> EffM m b xs xs''
 (>>=) = EBind
+
+export %inline
+(>>) : EffM m a xs (\_ => xs') -> EffM m b xs' (\_ => xs'') -> EffM m b xs (\_ => xs'')
+ma >> mb = ma >>= \_ => mb
 
 -- namespace SimpleBind
 --   (>>=) : Eff m a xs (\v => xs) ->
@@ -313,7 +317,7 @@ export
 export
 (*>) : EffM m a xs (\v => xs) ->
        EffM m b xs (\v => xs) -> EffM m b xs (\v => xs)
-a *> b = do _ <- a
+a *> b = do a
             b
 
 export
