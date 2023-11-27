@@ -378,11 +378,11 @@ lift e {prf} = LiftP prf e
 ||| implicit and initialised automatically.
 |||
 ||| @prog The effectful program to run.
--- export
--- run : Applicative m =>
---       (prog : EffM m a xs xs') -> {env : Env m xs} ->
---       m a
--- run prog {env} = eff env prog (\r, env => pure r)
+export
+run : {m : Type->Type} -> Applicative m =>
+      (prog : EffM m a xs xs') -> {env : Env m xs} ->
+      m a
+run prog {env} = eff env prog (\r, env => pure r)
 
 ||| Run an effectful program in the identity context.
 |||
@@ -401,9 +401,10 @@ runPure prog {env} = eff env prog (\r, env => r)
 |||
 ||| @env The environment to use.
 ||| @prog The effectful program to run.
--- export
--- runInit : Applicative m => (env : Env m xs) -> (prog : EffM m a xs xs') -> m a
--- runInit env prog = eff env prog (\r, env => pure r)
+export
+runInit : {m : Type->Type} -> Applicative m =>
+          (env : Env m xs) -> (prog : EffM m a xs xs') -> m a
+runInit env prog = eff env prog (\r, env => pure r)
 
 ||| Run an effectful program with a given default value for the environment.
 |||
@@ -415,20 +416,21 @@ export
 runPureInit : (env : Env Basics.id xs) -> (prog : EffM Basics.id a xs xs') -> a
 runPureInit env prog = eff env prog (\r, env => r)
 
--- export
--- runWith : (a -> m a) -> Env m xs -> EffM m a xs xs' -> m a
--- runWith inj env prog = eff env prog (\r, env => inj r)
+export
+runWith : {m : Type->Type} -> (a -> m a) -> Env m xs -> EffM m a xs xs' -> m a
+runWith inj env prog = eff env prog (\r, env => inj r)
 
 ||| Similar to 'runInit', but take the result of `Env`.
--- export
--- runEnv : Applicative m => Env m xs -> EffM m a xs xs' ->
---          m (x : a ** Env m (xs' x))
--- runEnv env prog = eff env prog (\r, env => pure (r ** env))
+export
+runEnv : {m : Type->Type} -> Applicative m =>
+         Env m xs -> EffM m a xs xs' ->
+         m (x : a ** Env m (xs' x))
+runEnv env prog = eff env prog (\r, env => pure (r ** env))
 
 ||| Similar to 'runEnv', but the context (m) is 'pure'
--- export
--- runPureEnv : (env : Env Basics.id xs) -> (prog : EffM Basics.id a xs xs') -> (x : a ** Env Basics.id (xs' x))
--- runPureEnv env prog = eff env prog (\r, env => (r ** env))
+export
+runPureEnv : (env : Env Basics.id xs) -> (prog : EffM Basics.id a xs xs') -> (x : a ** Env Basics.id (xs' x))
+runPureEnv env prog = eff env prog (\r, env => (r ** env))
 
 -- ----------------------------------------------- [ some higher order things ]
 

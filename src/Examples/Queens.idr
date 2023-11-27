@@ -16,7 +16,7 @@ addQueens col qs = do row <- select (rowsIn col qs)
                       addQueens (col - 1) ((row, col) :: qs)
 
 getQueens : Maybe (List (Int, Int))
-getQueens = run (addQueens 8 [])
+getQueens = runInit [()] (addQueens 8 [])
 
 main : IO ()
 main = do putStrLn ("Solution:\n" ++ show getQueens)
