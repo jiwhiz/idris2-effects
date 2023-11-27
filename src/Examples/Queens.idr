@@ -18,5 +18,11 @@ addQueens col qs = do row <- select (rowsIn col qs)
 getQueens : Maybe (List (Int, Int))
 getQueens = runInit [()] (addQueens 8 [])
 
+getAllQueens : List (List (Int, Int))
+getAllQueens = runInit [()] (addQueens 8 [])
+
 main : IO ()
-main = do putStrLn ("Solution:\n" ++ show getQueens)
+main =
+    do
+        putStrLn ("One Solution:\n" ++ show getQueens)
+        putStrLn ("All Solutions:\n" ++ show getAllQueens)
