@@ -43,7 +43,7 @@ STDIO = MkEff () StdIO
 ||| Write a string to standard output.
 public export
 putStr : String -> Eff () [STDIO]
-putStr s = call (PutStr s) {prf=Here}
+putStr s = call (PutStr s) {prf=Z}
 
 ||| Write a string to standard output, terminating with a newline.
 public export
@@ -53,7 +53,7 @@ putStrLn s = putStr (s ++ "\n")
 ||| Write a character to standard output.
 public export
 putChar : Char -> Eff () [STDIO]
-putChar c = call (PutCh c) {prf=Here}
+putChar c = call (PutCh c) {prf=Z}
 
 ||| Write a character to standard output, terminating with a newline.
 public export
@@ -63,12 +63,12 @@ putCharLn c = putStrLn (singleton c)
 ||| Read a string from standard input.
 public export
 getStr : Eff String [STDIO]
-getStr = call GetStr {prf=Here}
+getStr = call GetStr {prf=Z}
 
 ||| Read a character from standard input.
 public export
 getChar : Eff Char [STDIO]
-getChar = call GetCh {prf=Here}
+getChar = call GetCh {prf=Z}
 
 ||| Given a parameter `a` 'show' `a` to standard output.
 public export

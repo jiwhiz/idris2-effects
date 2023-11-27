@@ -3,7 +3,6 @@ module Effects
 import Language.Reflection
 import Data.Vect
 import public Data.List
-import public Data.List.Elem
 
 --- Effectful computations are described as algebraic data types that
 --- explain how an effect is interpreted in some underlying context.
@@ -176,10 +175,10 @@ rebuildEnv (x :: xs) (InList idx rest) env = replaceEnvAt x idx (rebuildEnv xs r
 
 public export
 total updateResTy : {a, b, e : _} -> (val : t) ->
-              (xs : List EFFECT) -> with List Elem (MkEff a e) xs -> e t a b ->
+              (xs : List EFFECT) -> SubElem (MkEff a e) xs -> e t a b ->
               List EFFECT
-updateResTy {b} val (MkEff a e :: xs) Here n = (MkEff (b val) e) :: xs
-updateResTy     val (x :: xs)    (There p) n = x :: updateResTy val xs p n
+updateResTy {b} val (MkEff a e :: xs) Z n = (MkEff (b val) e) :: xs
+updateResTy     val (x :: xs)    (S p) n = x :: updateResTy val xs p n
 
 infix 5 ##, #-, #=
 
@@ -217,7 +216,7 @@ data EffM : (m : Type -> Type) -> (x : Type)
      Value    : (val : a) -> EffM m a (xs val) xs
      EBind    : EffM m a xs xs' ->
                 ((val : a) -> EffM m b (xs' val) xs'') -> EffM m b xs xs''
-     CallP    : {a, e, xs:_} -> (prf : with List Elem (MkEff a e) xs) ->
+     CallP    : {a, e, xs:_} -> (prf : SubElem (MkEff a e) xs) ->
                 (eff : e t a b) ->
                 EffM m t xs (\v => updateResTy v xs prf eff)
 
@@ -330,12 +329,12 @@ new = New
 -- ---------------------------------------------------------- [ an interpreter ]
 
 private
-execEff : {m, e, xs, res : _} -> Env m xs -> (p : with List Elem (MkEff res e) xs) ->
+execEff : {m, e, xs, res : _} -> Env m xs -> (p : SubElem (MkEff res e) xs) ->
           (eff : e a res resk) ->
           ((v : a) -> Env m (updateResTy v xs p eff) -> m t) -> m t
-execEff (val :: env) Here eff' k
+execEff (val :: env) Z eff' k
     = handle val eff' (\v, res => k v (res :: env))
-execEff (val :: env) (There p) eff k
+execEff (val :: env) (S p) eff k
     = execEff env p eff (\v, env' => k v (val :: env'))
 
 -- Q: Instead of m b, implement as StateT (Env m xs') m b, so that state
@@ -359,7 +358,7 @@ eff env (l #- prog) k
 export
 call : {a, b, xs: _} -> {e : Effect} ->
        (eff : e t a b) ->
-       {auto prf : with List Elem (MkEff a e) xs} ->
+       {auto prf : SubElem (MkEff a e) xs} ->
       EffM m t xs (\v => updateResTy v xs prf eff)
 call e {prf} = CallP prf e
 
@@ -369,6 +368,9 @@ lift : EffM m t ys ys' ->
        EffM m t xs (\v => updateWith (ys' v) xs prf)
 lift e {prf} = LiftP prf e
 
+public export
+0 Has : List a -> a -> Type
+Has es e = SubList [e] es
 
 -- --------------------------------------------------------- [ Running Effects ]
 ||| Run an effectful program.

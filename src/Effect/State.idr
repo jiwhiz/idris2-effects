@@ -1,7 +1,6 @@
 module Effect.State
 
 import Effects
-import Data.List.Elem
 
 public export
 data State : Effect where
@@ -20,15 +19,15 @@ STATE t = MkEff t State
 
 public export
 get : {x : _} -> Eff x [STATE x]
-get = call Get {prf=Here}
+get = call Get {prf=Z}
 
 public export
 put : {x : _} -> x -> Eff () [STATE x]
-put val = call (Put val) {prf=Here}
+put val = call (Put val) {prf=Z}
 
 public export
 putM : {x, y : _} -> y -> Eff () [STATE x] [STATE y]
-putM val = call (Put val) {prf=Here}
+putM val = call (Put val) {prf=Z}
 
 public export
 update : {x : _} -> (x -> x) -> Eff () [STATE x]
@@ -45,4 +44,3 @@ locally newst prog = do st <- get
                         val <- prog
                         putM st
                         pure val
-

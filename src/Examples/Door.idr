@@ -1,4 +1,4 @@
-module Examples.Door
+module Main
 
 import Effects
 
@@ -15,13 +15,13 @@ DOOR : DoorState -> EFFECT
 DOOR t = MkEff (DoorInfo t) Door
 
 openDoor : Eff () [DOOR Closed] [DOOR Open]
-openDoor = call OpenDoor {prf=Here}
+openDoor = call OpenDoor {prf=Z}
 
 closeDoor : Eff () [DOOR Open] [DOOR Closed]
-closeDoor = call CloseDoor {prf=Here}
+closeDoor = call CloseDoor {prf=Z}
 
 knock : Eff () [DOOR Closed]
-knock = call Knock {prf=Here}
+knock = call Knock {prf=Z}
 
 doorProg : Eff () [DOOR Closed]
 doorProg = do knock

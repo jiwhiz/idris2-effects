@@ -30,4 +30,4 @@ EXCEPTION t = MkEff () (Exception t)
 
 public export
 raise : {a:_} -> a -> Eff b [EXCEPTION a]
-raise err = call (Raise err) {prf=Here}
+raise err = call (Raise err) {prf=Z}

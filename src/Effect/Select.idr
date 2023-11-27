@@ -26,5 +26,5 @@ SELECT = MkEff () Selection
 
 public export
 select : List a -> Eff a [SELECT]
-select xs = call (Select xs) {prf=Here}
+select xs = call (Select xs) {prf=Z}
 

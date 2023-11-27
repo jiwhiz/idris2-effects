@@ -34,17 +34,15 @@ RND = MkEff Integer Random
 ||| Generates a random Integer in a given range
 public export
 rndInt : Integer -> Integer -> Eff Integer [RND]
-rndInt lower upper = do v <- call GetRandom {prf=Here}
+rndInt lower upper = do v <- call GetRandom {prf=Z}
                         pure ((v `mod` (upper - lower)) + lower)
-                        -- divBigInt v 2 is required to prevent low bit alternating between
-                        -- 0 and 1 (odd and even) ???
 
 ||| Generate a random number in Fin (S `k`)
 |||
 ||| Note that rndFin k takes values 0, 1, ..., k.
 public export
 rndFin : (k : Nat) -> Eff (Fin (S k)) [RND]
-rndFin k = do let v = assert_total $ !(call GetRandom {prf=Here})
+rndFin k = do let v = assert_total $ !(call GetRandom {prf=Z})
               pure (toFin v)
  where toFin : Integer -> Fin (S k)
        toFin x = case integerToFin x (S k) of
@@ -67,5 +65,5 @@ rndSelect (x::xs) = pure (Just !(rndSelect' (x::(fromList xs))))
 ||| Sets the random seed
 public export
 srand : Integer -> Eff () [RND]
-srand n = call (SetSeed n) {prf=Here}
+srand n = call (SetSeed n) {prf=Z}
 
