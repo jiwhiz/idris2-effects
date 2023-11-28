@@ -79,7 +79,7 @@ data SubList : List a -> List a -> Type where
   SubNil : SubList [] xs
   InList : SubElem x ys -> SubList xs ys -> SubList (x :: xs) ys
 
-export
+public export
 Uninhabited (SubElem x []) where
   uninhabited Z impossible
   uninhabited (S _) impossible
@@ -356,21 +356,24 @@ eff env (l #- prog) k
          eff env' prog (\p', envk => k p' (relabel l envk))
 
 export
-call : {a, b, xs: _} -> {e : Effect} ->
-       (eff : e t a b) ->
-       {auto prf : SubElem (MkEff a e) xs} ->
-      EffM m t xs (\v => updateResTy v xs prf eff)
-call e {prf} = CallP prf e
+call : {a, b, xs: _}
+    -> {e : Effect}
+    -> (eff : e t a b)
+    -> {auto prf : SubElem (MkEff a e) xs}
+    -> EffM m t xs (\v => updateResTy v xs prf eff)
+call eff {prf} = CallP prf eff
 
 export
-lift : EffM m t ys ys' ->
-       {auto prf : SubList ys xs} ->
-       EffM m t xs (\v => updateWith (ys' v) xs prf)
-lift e {prf} = LiftP prf e
+lift : EffM m t ys ys'
+    -> {auto prf : SubList ys xs}
+    -> EffM m t xs (\v => updateWith (ys' v) xs prf)
+lift eff {prf} = LiftP prf eff
 
 public export
-0 Has : List a -> a -> Type
-Has es e = SubList [e] es
+0 Has : (e : EFFECT) -> (es : List EFFECT) -> SubList [e] es
+Has e [] = ?Has_rhs_0
+Has e (x :: xs) = ?Has_rhs_1
+
 
 -- --------------------------------------------------------- [ Running Effects ]
 ||| Run an effectful program.
