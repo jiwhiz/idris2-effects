@@ -19,10 +19,10 @@ testTree = Node (Node Leaf "One" (Node Leaf "Two" Leaf))
 data Tag : Type where
 data Counts : Type where
 
-label : Tree a -> Eff (Tree (Int, a)) [Counts ## STATE Integer, Tag ## STATE Int] 
+label : Tree a -> Eff (Tree (Int, a)) [Counts ## STATE Int, Tag ## STATE Int] 
 label Leaf =
     do
-        lift $ Counts #- update (+1)
+        lift $ Counts #- update (+ (cast {to=Int} 1))
         pure Leaf
 label (Node l x r) =
     do
