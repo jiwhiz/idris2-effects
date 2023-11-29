@@ -7,6 +7,8 @@ import public Data.List
 --- Effectful computations are described as algebraic data types that
 --- explain how an effect is interpreted in some underlying context.
 
+%default total
+
 -- ----------------------------------------------------------------- [ Effects ]
 ||| The Effect type describes effectful computations.
 |||
@@ -137,7 +139,7 @@ dropEnv [] SubNil = []
 dropEnv [] (InList idx rest) = absurd idx
 dropEnv (y::ys) SubNil = []
 dropEnv e@(y::ys) (InList idx rest) =
-  let [x] = envElem idx e
+  let [x] := envElem idx e
   in x :: dropEnv e rest
 
 public export
@@ -347,12 +349,12 @@ eff env (prog `EBind` c) k
    = eff env prog (\p', env' => eff env' (c p') k)
 eff env (CallP prf effP) k = execEff env prf effP k
 eff env (LiftP prf effP) k
-   = let env' = dropEnv env prf in
+   = let env' := dropEnv env prf in
          eff env' effP (\p', envk => k p' (rebuildEnv envk prf env))
 eff env (New (MkEff resTy newEff) res {prf=Refl} effP) k
    = eff (res :: env) effP (\p', (val :: envk) => k p' envk)
 eff env (l #- prog) k
-   = let env' = unlabel env in
+   = let env' := unlabel env in
          eff env' prog (\p', envk => k p' (relabel l envk))
 
 export
@@ -368,11 +370,6 @@ lift : EffM m t ys ys'
     -> {auto prf : SubList ys xs}
     -> EffM m t xs (\v => updateWith (ys' v) xs prf)
 lift eff {prf} = LiftP prf eff
-
-public export
-0 Has : (e : EFFECT) -> (es : List EFFECT) -> SubList [e] es
-Has e [] = ?Has_rhs_0
-Has e (x :: xs) = ?Has_rhs_1
 
 
 -- --------------------------------------------------------- [ Running Effects ]
